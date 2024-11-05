@@ -1,0 +1,13 @@
+{
+  "name": "dispersal-container-check",
+  "version": "0.1.0",
+  "description": "Docker Compose security posture checks",
+  "type": "module",
+  "bin": {"container-check": "src/container-check.js"},
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check src/container-check.js && node --check src/audit.js"
+  },
+  "engines": {"node": ">=20"},
+  "license": "MIT"
+}
