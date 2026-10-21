@@ -35,3 +35,13 @@ test('flags root users given with a group', () => {
     assert.equal(rules.includes('root-user'), false, `user ${user}`);
   }
 });
+
+test('a registry port is not mistaken for an image tag', () => {
+  const pinned = (image) => !auditCompose({services: {api: {image}}}).some((item) => item.rule === 'unpinned-image');
+  assert.equal(pinned('registry.local:5000/team/api'), false);
+  assert.equal(pinned('registry.local:5000/team/api:latest'), false);
+  assert.equal(pinned('registry.local:5000/team/api:1.4.2'), true);
+  assert.equal(pinned('registry.local:5000/team/api@sha256:abcdef'), true);
+  assert.equal(pinned('api'), false);
+  assert.equal(pinned('api:2.0'), true);
+});

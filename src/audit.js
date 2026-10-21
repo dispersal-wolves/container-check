@@ -36,7 +36,8 @@ export function auditService(name, service) {
     if (!port.startsWith('127.0.0.1:') && !port.startsWith('[::1]:')) findings.push(finding(name, 'public-port', 'medium', `Published port may bind all interfaces: ${port}`));
   }
   const image = String(service.image ?? '');
-  if (image && (!image.includes('@sha256:') && (!image.includes(':') || image.endsWith(':latest')))) findings.push(finding(name, 'unpinned-image', 'medium', `Image is not pinned to a digest or immutable version: ${image}`));
+  const tag = image.split('/').pop().split(':')[1];
+  if (image && !image.includes('@sha256:') && (tag === undefined || tag === 'latest')) findings.push(finding(name, 'unpinned-image', 'medium', `Image is not pinned to a digest or immutable version: ${image}`));
   if (service.read_only !== true) findings.push(finding(name, 'writable-rootfs', 'low', 'Container root filesystem is writable.'));
   if (!service.healthcheck || service.healthcheck.disable === true) findings.push(finding(name, 'missing-healthcheck', 'low', 'No active container health check is defined.'));
   const user = service.user === undefined ? undefined : String(service.user).split(':', 1)[0].trim().toLowerCase();
