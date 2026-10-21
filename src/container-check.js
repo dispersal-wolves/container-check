@@ -7,6 +7,12 @@ import {auditCompose} from './audit.js';
 
 function usage() {
   console.log('Usage: container-check scan <compose.yaml|compose.json> [--format text|json] [--strict low|medium|high|critical]');
+  console.log('');
+  console.log('  --format text|json   Output format (default: text).');
+  console.log('  --strict <level>     Exit 1 when a finding is at or above <level>.');
+  console.log('  -h, --help           Show this help.');
+  console.log('');
+  console.log('Exit codes: 0 ok, 1 strict threshold reached, 2 usage or input error.');
 }
 
 function loadCompose(file) {
@@ -18,6 +24,10 @@ function loadCompose(file) {
 }
 
 export function run(argv) {
+  if (argv.includes('--help') || argv.includes('-h')) {
+    usage();
+    return 0;
+  }
   if (argv[0] !== 'scan' || !argv[1]) {
     usage();
     return 2;
