@@ -24,3 +24,14 @@ test('a constrained service produces no findings', () => {
   }}});
   assert.deepEqual(findings, []);
 });
+
+test('flags root users given with a group', () => {
+  for (const user of ['0', 0, 'root', '0:0', 'root:root', 'ROOT:1000', '0:1000']) {
+    const rules = auditCompose({services: {api: {user}}}).map((item) => item.rule);
+    assert.equal(rules.includes('root-user'), true, `user ${user}`);
+  }
+  for (const user of ['1000', '1000:0', 'app:root']) {
+    const rules = auditCompose({services: {api: {user}}}).map((item) => item.rule);
+    assert.equal(rules.includes('root-user'), false, `user ${user}`);
+  }
+});

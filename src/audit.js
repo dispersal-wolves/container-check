@@ -39,7 +39,8 @@ export function auditService(name, service) {
   if (image && (!image.includes('@sha256:') && (!image.includes(':') || image.endsWith(':latest')))) findings.push(finding(name, 'unpinned-image', 'medium', `Image is not pinned to a digest or immutable version: ${image}`));
   if (service.read_only !== true) findings.push(finding(name, 'writable-rootfs', 'low', 'Container root filesystem is writable.'));
   if (!service.healthcheck || service.healthcheck.disable === true) findings.push(finding(name, 'missing-healthcheck', 'low', 'No active container health check is defined.'));
-  if (service.user === undefined || String(service.user) === '0' || String(service.user).toLowerCase() === 'root') findings.push(finding(name, 'root-user', 'medium', 'Container may run as root.'));
+  const user = service.user === undefined ? undefined : String(service.user).split(':', 1)[0].trim().toLowerCase();
+  if (user === undefined || user === '' || user === '0' || user === 'root') findings.push(finding(name, 'root-user', 'medium', 'Container may run as root.'));
   for (const [key, value] of Object.entries(normalizeEnvironment(service.environment))) {
     if (SECRET_NAME.test(key) && value !== null && value !== undefined && String(value).trim() !== '') findings.push(finding(name, 'embedded-secret', 'high', `Sensitive-looking environment variable ${key} has an inline value.`));
   }
